@@ -2,3 +2,5 @@ fastapi
 prometheus-client 
 uvicorn
 prometheus-fastapi-instrumentator
+numpy
+psutil
