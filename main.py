@@ -4,6 +4,8 @@ import time
 from fastapi.responses import Response
 from prometheus_fastapi_instrumentator import Instrumentator
 import logging
+import numpy as np
+import psutil
 
 # Configure logging
 logger = logging.getLogger("fastapi")
@@ -56,9 +58,9 @@ def update_system_metrics():
 # Metrics endpoint
 @app.get("/metrics")
 async def metrics():
-    # logger.info("Updating system metrics")
-    # update_system_metrics()
-    # logger.info("Updated system metrics")
+    logger.info("Updating system metrics")
+    update_system_metrics()
+    logger.info("Updated system metrics")
     return Response(
         content=generate_latest(REGISTRY),
         media_type="text/plain"
@@ -72,12 +74,15 @@ async def heavy_operation():
         matrix_a = np.random.rand(size, size)
         matrix_b = np.random.rand(size, size)
         result = np.dot(matrix_a, matrix_b)
+        a = 0
+        for i in range(100000000):
+            a += i
         
         # Simulate a failure condition
         if np.random.rand() > 0.95:  # 5% chance of failure
             raise ValueError("Simulated heavy operation failure")
 
-        return {"message": "Success", "result_sum": np.sum(result)}
+        return {"message": "Success", "result_sum": np.sum(result), "a": a}
     except Exception as e:
         # Increment the failure counter when an exception occurs
         raise HTTPException(status_code=500, detail="Internal Server Error")
